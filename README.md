@@ -1,7 +1,12 @@
-# Gerenciador de Tarefas — Atividade 15 (Git + Desenvolvimento de Software com IA)
+# [ATIVIDADE ACADÊMICA] Gerenciador de Tarefas — Atividade 15 da faculdade
 
-> ## 🔗 Sistema publicado: **https://gerenciador-tarefas-ia.onrender.com**
-> Repositório: https://github.com/victoraugustovalle/gerenciador-tarefas-ia
+> [!IMPORTANT]
+> **📚 Este repositório é uma atividade acadêmica obrigatória**, feita a pedido do professor na disciplina de Git + Desenvolvimento de Software com IA.
+> Ele existe aqui **apenas para cumprir a exigência de entrega** (o professor pediu que o código fosse publicado no GitHub) e **não faz parte do meu portfólio profissional**.
+> O escopo, o tema e as etapas foram definidos pelo enunciado da atividade.
+
+> ## 🔗 Sistema publicado: **https://atividade-faculdade-gerenciador-tarefas.onrender.com**
+> Repositório: https://github.com/victoraugustovalle/atividade-faculdade-gerenciador-tarefas
 >
 > O plano gratuito do Render "adormece" o serviço após 15 minutos sem acesso. Por isso, o primeiro acesso pode levar cerca de 1 minuto para carregar.
 
@@ -68,8 +73,8 @@ Sistema web simples para **organizar tarefas pessoais**: o usuário cadastra o q
 Pré-requisito: **Node.js 22.13 ou superior** (`node -v`).
 
 ```bash
-git clone https://github.com/victoraugustovalle/gerenciador-tarefas-ia.git
-cd gerenciador-tarefas-ia
+git clone https://github.com/victoraugustovalle/atividade-faculdade-gerenciador-tarefas.git
+cd atividade-faculdade-gerenciador-tarefas
 npm install
 npm start
 ```

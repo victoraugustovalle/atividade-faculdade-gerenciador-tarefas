@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: gerenciador-tarefas-ia
+    name: atividade-faculdade-gerenciador-tarefas
     runtime: node
     plan: free
     buildCommand: npm install
