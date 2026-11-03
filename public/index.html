@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciador de Tarefas</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topo">
+    <h1>Gerenciador de Tarefas</h1>
+    <p>Organize suas tarefas por prioridade, prazo e status.</p>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2 id="form-titulo">Nova tarefa</h2>
+      <form id="task-form" novalidate>
+        <input type="hidden" id="task-id">
+        <div class="campo">
+          <label for="title">Título *</label>
+          <input type="text" id="title" maxlength="100" placeholder="Ex.: Estudar para a prova">
+          <small class="erro" id="erro-title"></small>
+        </div>
+        <div class="campo">
+          <label for="description">Descrição</label>
+          <textarea id="description" rows="3" maxlength="500" placeholder="Detalhes da tarefa (opcional)"></textarea>
+        </div>
+        <div class="linha">
+          <div class="campo">
+            <label for="priority">Prioridade *</label>
+            <select id="priority">
+              <option value="baixa">Baixa</option>
+              <option value="media" selected>Média</option>
+              <option value="alta">Alta</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="due_date">Prazo</label>
+            <input type="date" id="due_date">
+            <small class="erro" id="erro-due_date"></small>
+          </div>
+          <div class="campo">
+            <label for="status">Status</label>
+            <select id="status">
+              <option value="pendente" selected>Pendente</option>
+              <option value="concluida">Concluída</option>
+            </select>
+          </div>
+        </div>
+        <div class="acoes">
+          <button type="submit" class="btn primario" id="btn-salvar">Cadastrar</button>
+          <button type="button" class="btn" id="btn-cancelar" hidden>Cancelar edição</button>
+        </div>
+      </form>
+    </section>
+
+    <div id="mensagem" class="mensagem" role="status" aria-live="polite" hidden></div>
+
+    <section class="card">
+      <div class="lista-topo">
+        <h2>Minhas tarefas</h2>
+        <div class="filtros">
+          <input type="search" id="busca" placeholder="Pesquisar...">
+          <select id="filtro-status">
+            <option value="">Todas</option>
+            <option value="pendente">Pendentes</option>
+            <option value="concluida">Concluídas</option>
+          </select>
+        </div>
+      </div>
+      <ul id="lista" class="lista"></ul>
+      <p id="vazio" class="vazio" hidden>Nenhuma tarefa encontrada.</p>
+    </section>
+  </main>
+
+  <footer class="rodape">Atividade 15 — Desenvolvimento de software com IA</footer>
+  <script src="app.js"></script>
+</body>
+</html>
