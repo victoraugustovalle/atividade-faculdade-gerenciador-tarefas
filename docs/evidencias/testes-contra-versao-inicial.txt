@@ -1,0 +1,501 @@
+▶ Cadastro de tarefa (POST /api/tasks)
+  ✔ quando os dados são válidos, então cria a tarefa como pendente e devolve 201 (79.1966ms)
+  ✔ quando só o título é enviado, então usa prioridade média, status pendente e sem prazo (8.4121ms)
+  ✖ quando o título tem espaços nas pontas, então grava o título sem eles (8.8235ms)
+  ✖ quando o título está ausente, então devolve 400 com mensagem e não grava (7.5172ms)
+  ✖ quando o título tem só espaços, então devolve 400 (17.6887ms)
+  ✖ quando o título tem menos de 3 caracteres, então devolve 400 (7.8267ms)
+  ✔ quando o título tem exatamente 3 e 100 caracteres, então aceita (limites) (11.6354ms)
+  ✖ quando o título passa de 100 caracteres, então devolve 400 (7.4291ms)
+  ✖ quando o título não é texto (número ou objeto), então devolve 400 e não erro 500 (8.717ms)
+  ✖ quando a descrição passa de 500 caracteres, então devolve 400 (6.0053ms)
+  ✖ quando a prioridade não é baixa/media/alta, então devolve 400 (5.579ms)
+  ✖ quando o status não é pendente/concluida, então devolve 400 (6.3347ms)
+  ✖ quando o prazo não está no formato AAAA-MM-DD ou não existe, então devolve 400 (5.9323ms)
+  ✖ quando o prazo está no passado, então devolve 400 (5.7461ms)
+  ✔ quando o prazo é hoje, então aceita (limite) (33.4562ms)
+  ✔ quando são 21h30 no Brasil (já é o dia seguinte em UTC) e o prazo é hoje, então aceita (6.2176ms)
+SyntaxError: Expected property name or '}' in JSON at position 1 (line 1 column 2)
+    at JSON.parse (<anonymous>)
+    at parse (C:\Users\victo\Documents\Atv 15 - QA\node_modules\body-parser\lib\types\json.js:92:19)
+    at C:\Users\victo\Documents\Atv 15 - QA\node_modules\body-parser\lib\read.js:128:18
+    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)
+    at invokeCallback (C:\Users\victo\Documents\Atv 15 - QA\node_modules\raw-body\index.js:238:16)
+    at done (C:\Users\victo\Documents\Atv 15 - QA\node_modules\raw-body\index.js:227:7)
+    at IncomingMessage.onEnd (C:\Users\victo\Documents\Atv 15 - QA\node_modules\raw-body\index.js:287:7)
+    at IncomingMessage.emit (node:events:508:28)
+    at endReadableNT (node:internal/streams/readable:1701:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:89:21)
+  ✖ quando o corpo é um JSON malformado, então devolve 400 em JSON, sem stack (7.0339ms)
+  ✖ quando o corpo passa de 10kb, então devolve 413 (7.9603ms)
+  ✔ quando o título contém HTML, então grava como texto puro (a tela exibe com textContent) (5.0726ms)
+  ✔ quando o mesmo cadastro é enviado 2 vezes ao mesmo tempo, então ambos são criados com IDs distintos (9.3337ms)
+✖ Cadastro de tarefa (POST /api/tasks) (259.7713ms)
+▶ Listagem e pesquisa (GET /api/tasks)
+  ✔ quando não há tarefas, então devolve lista vazia (12.4366ms)
+  ✔ quando há tarefas, então lista pendentes antes das concluídas e por prazo mais próximo (17.3317ms)
+  ✔ quando filtra por status, então devolve só as tarefas daquele status (14.4172ms)
+  ✖ quando o filtro de status é inválido, então devolve 400 (6.2621ms)
+  ✔ quando pesquisa um termo, então encontra no título ou na descrição (24.4628ms)
+  ✖ quando a busca contém injeção de SQL, então trata como texto e não devolve tudo (12.7058ms)
+  ✖ quando a busca contém % ou _, então trata como caractere literal (16.0056ms)
+✖ Listagem e pesquisa (GET /api/tasks) (104.5886ms)
+▶ Consulta de uma tarefa (GET /api/tasks/:id)
+  ✔ quando o ID existe, então devolve a tarefa (11.2961ms)
+  ✔ quando o ID não existe, então devolve 404 (6.233ms)
+  ✖ quando o ID não é inteiro positivo, então devolve 400 (6.272ms)
+✖ Consulta de uma tarefa (GET /api/tasks/:id) (24.344ms)
+▶ Edição de tarefa (PUT /api/tasks/:id)
+  ✔ quando os dados são válidos, então atualiza e devolve a tarefa (14.5344ms)
+  ✔ quando a tarefa já tem prazo no passado, então a edição mantém o prazo (regra só vale no cadastro) (9.9835ms)
+  ✔ quando os dados são inválidos, então devolve 400 e não altera o banco (9.5823ms)
+  ✔ quando o ID não existe, então devolve 404 (5.7072ms)
+✔ Edição de tarefa (PUT /api/tasks/:id) (40.179ms)
+▶ Alteração de status (PATCH /api/tasks/:id/status)
+  ✔ quando marca como concluída, então grava o status (9.7235ms)
+  ✔ quando reabre uma tarefa concluída, então volta a pendente (9.3275ms)
+  ✖ quando o usuário clica 2 vezes em "Concluir" ao mesmo tempo, então a tarefa termina concluída (11.9212ms)
+  ✖ quando o status é inválido ou não é informado, então devolve 400 (10.6231ms)
+  ✔ quando o ID não existe, então devolve 404 (6.0233ms)
+✖ Alteração de status (PATCH /api/tasks/:id/status) (48.1282ms)
+▶ Exclusão de tarefa (DELETE /api/tasks/:id)
+  ✔ quando o ID existe, então remove e devolve 204 (15.0899ms)
+  ✔ quando a mesma exclusão é enviada 2 vezes ao mesmo tempo, então uma remove (204) e a outra recebe 404 (12.7096ms)
+  ✔ quando o ID não existe, então devolve 404 (5.5659ms)
+✔ Exclusão de tarefa (DELETE /api/tasks/:id) (33.7355ms)
+▶ Segurança da aplicação
+  ✖ quando a página é servida, então envia cabeçalhos de segurança e não expõe X-Powered-By (9.9323ms)
+  ✖ quando acessa uma rota de API inexistente, então devolve 404 em JSON (7.2986ms)
+  ✖ quando ocorre um erro interno, então devolve mensagem genérica sem stack (7.6768ms)
+✖ Segurança da aplicação (25.5155ms)
+ℹ tests 45
+ℹ suites 7
+ℹ pass 23
+ℹ fail 22
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1338.9797
+
+✖ failing tests:
+
+test at tests\tasks.test.js:44:3
+✖ quando o título tem espaços nas pontas, então grava o título sem eles (8.8235ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '   Comprar pão   '
+  - 'Comprar pão'
+  
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:46:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '   Comprar pão   ',
+    expected: 'Comprar pão',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\tasks.test.js:49:3
+✖ quando o título está ausente, então devolve 400 com mensagem e não grava (7.5172ms)
+  TypeError: Cannot read properties of undefined (reading 'title')
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:53:31)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7)
+
+test at tests\tasks.test.js:57:3
+✖ quando o título tem só espaços, então devolve 400 (17.6887ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  201 !== 400
+  
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:59:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 201,
+    expected: 400,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\tasks.test.js:62:3
+✖ quando o título tem menos de 3 caracteres, então devolve 400 (7.8267ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  201 !== 400
+  
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:64:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 201,
+    expected: 400,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\tasks.test.js:73:3
+✖ quando o título passa de 100 caracteres, então devolve 400 (7.4291ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  201 !== 400
+  
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:75:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 201,
+    expected: 400,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\tasks.test.js:79:3
+✖ quando o título não é texto (número ou objeto), então devolve 400 e não erro 500 (8.717ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  201 !== 400
+  
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:80:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 201,
+    expected: 400,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\tasks.test.js:84:3
+✖ quando a descrição passa de 500 caracteres, então devolve 400 (6.0053ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  201 !== 400
+  
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:86:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 201,
+    expected: 400,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\tasks.test.js:90:3
+✖ quando a prioridade não é baixa/media/alta, então devolve 400 (5.579ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  201 !== 400
+  
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:92:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 201,
+    expected: 400,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\tasks.test.js:96:3
+✖ quando o status não é pendente/concluida, então devolve 400 (6.3347ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  201 !== 400
+  
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:98:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 201,
+    expected: 400,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\tasks.test.js:102:3
+✖ quando o prazo não está no formato AAAA-MM-DD ou não existe, então devolve 400 (5.9323ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  201 !== 400
+  
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:103:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 201,
+    expected: 400,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\tasks.test.js:108:3
+✖ quando o prazo está no passado, então devolve 400 (5.7461ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  201 !== 400
+  
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:110:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 201,
+    expected: 400,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\tasks.test.js:126:3
+✖ quando o corpo é um JSON malformado, então devolve 400 em JSON, sem stack (7.0339ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - 'JSON inválido no corpo da requisição.'
+  
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:129:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 'JSON inválido no corpo da requisição.',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\tasks.test.js:133:3
+✖ quando o corpo passa de 10kb, então devolve 413 (7.9603ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  201 !== 413
+  
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:135:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 201,
+    expected: 413,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\tasks.test.js:175:3
+✖ quando o filtro de status é inválido, então devolve 400 (6.2621ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  200 !== 400
+  
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:177:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 200,
+    expected: 400,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\tasks.test.js:188:3
+✖ quando a busca contém injeção de SQL, então trata como texto e não devolve tudo (12.7058ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + [
+  +   {
+  +     created_at: '2026-11-03 00:21:33',
+  +     description: 'Capítulo 3',
+  +     due_date: '2099-12-31',
+  +     id: 1,
+  +     priority: 'alta',
+  +     status: 'pendente',
+  +     title: 'Tarefa secreta',
+  +     updated_at: '2026-11-03 00:21:33'
+  +   }
+  + ]
+  - []
+  
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:192:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ { id: 1, title: 'Tarefa secreta', description: 'Capítulo 3', priority: 'alta', due_date: '2099-12-31', status: 'pendente', created_at: '2026-11-03 00:21:33', updated_at: '2026-11-03 00:21:33' } ],
+    expected: [],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests\tasks.test.js:195:3
+✖ quando a busca contém % ou _, então trata como caractere literal (16.0056ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  2 !== 1
+  
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:198:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 2,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\tasks.test.js:217:3
+✖ quando o ID não é inteiro positivo, então devolve 400 (6.272ms)
+  AssertionError [ERR_ASSERTION]: id abc
+  
+  404 !== 400
+  
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:219:14)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 400,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\tasks.test.js:268:3
+✖ quando o usuário clica 2 vezes em "Concluir" ao mesmo tempo, então a tarefa termina concluída (11.9212ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'pendente'
+  - 'concluida'
+  
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:275:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'pendente',
+    expected: 'concluida',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\tasks.test.js:278:3
+✖ quando o status é inválido ou não é informado, então devolve 400 (10.6231ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  200 !== 400
+  
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:280:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 200,
+    expected: 400,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\tasks.test.js:310:3
+✖ quando a página é servida, então envia cabeçalhos de segurança e não expõe X-Powered-By (9.9323ms)
+  AssertionError [ERR_ASSERTION]: The "string" argument must be of type string. Received type undefined (undefined)
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:313:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Promise.all (index 0)
+      at async Suite.run (node:internal/test_runner/test:1518:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /script-src 'self'/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests\tasks.test.js:319:3
+✖ quando acessa uma rota de API inexistente, então devolve 404 em JSON (7.2986ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - 'Rota não encontrada.'
+  
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:322:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 'Rota não encontrada.',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\tasks.test.js:325:3
+✖ quando ocorre um erro interno, então devolve mensagem genérica sem stack (7.6768ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+  +   error: 'no such table: tasks',
+  +   stack: 'Error: no such table: tasks\n' +
+  +     '    at C:\\Users\\victo\\AppData\\Local\\Temp\\claude\\c--Users-victo-Documents-Atv-15---QA\\292a7362-52fc-448c-9e7b-1bf0006d6a63\\scratchpad\\v1\\server.js:41:22\n' +
+  +     '    at Layer.handle [as handle_request] (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+  +     '    at next (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+  +     '    at Route.dispatch (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\route.js:119:3)\n' +
+  +     '    at Layer.handle [as handle_request] (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+  +     '    at C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\index.js:284:15\n' +
+  +     '    at router.process_params (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+  +     '    at next (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+  +     '    at SendStream.error (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\serve-static\\index.js:121:7)\n' +
+  +     '    at SendStream.emit (node:events:508:28)'
+  -   error: 'Erro interno do servidor.'
+    }
+  
+      at TestContext.<anonymous> (<versao-inicial>\tests\tasks.test.js:336:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { error: 'no such table: tasks', stack: 'Error: no such table: tasks\n    at C:\\Users\\victo\\AppData\\Local\\Temp\\claude\\c--Users-victo-Documents-Atv-15---QA\\292a7362-52fc-448c-9e7b-1bf0006d6a63\\scratchpad\\v1\\server.js:41:22\n    at Layer.handle [as handle_request] (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at next (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\route.js:149:13)\n    at Route.dispatch (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\route.js:119:3)\n    at Layer.handle [as handle_request] (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\index.js:284:15\n    at router.process_params (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at SendStream.error (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\serve-static\\index.js:121:7)\n    at SendStream.emit (node:events:508:28)' },
+    expected: { error: 'Erro interno do servidor.' },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

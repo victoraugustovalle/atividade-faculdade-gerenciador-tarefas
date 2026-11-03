@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node --no-warnings server.js",
-    "dev": "node --watch --no-warnings server.js"
+    "dev": "node --watch --no-warnings server.js",
+    "test": "node --no-warnings --test \"tests/**/*.test.js\""
   },
   "engines": {
     "node": ">=22.13"
@@ -13,5 +14,8 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "supertest": "^7.1.0"
   }
 }

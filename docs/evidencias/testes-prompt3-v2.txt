@@ -1,0 +1,71 @@
+
+> gerenciador-tarefas-ia@1.0.0 test
+> node --no-warnings --test "tests/**/*.test.js"
+
+▶ Cadastro de tarefa (POST /api/tasks)
+  ✔ quando os dados são válidos, então cria a tarefa como pendente e devolve 201 (105.3249ms)
+  ✔ quando só o título é enviado, então usa prioridade média, status pendente e sem prazo (9.2668ms)
+  ✔ quando o título tem espaços nas pontas, então grava o título sem eles (7.9259ms)
+  ✔ quando o título está ausente, então devolve 400 com mensagem e não grava (5.8222ms)
+  ✔ quando o título tem só espaços, então devolve 400 (6.7261ms)
+  ✔ quando o título tem menos de 3 caracteres, então devolve 400 (7.4894ms)
+  ✔ quando o título tem exatamente 3 e 100 caracteres, então aceita (limites) (11.5388ms)
+  ✔ quando o título passa de 100 caracteres, então devolve 400 (16.5809ms)
+  ✔ quando o título não é texto (número ou objeto), então devolve 400 e não erro 500 (12.3383ms)
+  ✔ quando a descrição passa de 500 caracteres, então devolve 400 (8.346ms)
+  ✔ quando a prioridade não é baixa/media/alta, então devolve 400 (9.7913ms)
+  ✔ quando o status não é pendente/concluida, então devolve 400 (6.9617ms)
+  ✔ quando o prazo não está no formato AAAA-MM-DD ou não existe, então devolve 400 (14.044ms)
+  ✔ quando o prazo está no passado, então devolve 400 (6.0975ms)
+  ✔ quando o prazo é hoje, então aceita (limite) (6.4803ms)
+  ✔ quando são 21h30 no Brasil (já é o dia seguinte em UTC) e o prazo é hoje, então aceita (6.5941ms)
+  ✔ quando o corpo é um JSON malformado, então devolve 400 em JSON, sem stack (5.594ms)
+  ✔ quando o corpo passa de 10kb, então devolve 413 (7.573ms)
+  ✔ quando o título contém HTML, então grava como texto puro (a tela exibe com textContent) (5.306ms)
+  ✔ quando o mesmo cadastro é enviado 2 vezes ao mesmo tempo, então ambos são criados com IDs distintos (10.5399ms)
+✔ Cadastro de tarefa (POST /api/tasks) (274.0983ms)
+▶ Listagem e pesquisa (GET /api/tasks)
+  ✔ quando não há tarefas, então devolve lista vazia (10.0177ms)
+  ✔ quando há tarefas, então lista pendentes antes das concluídas e por prazo mais próximo (20.2564ms)
+  ✔ quando filtra por status, então devolve só as tarefas daquele status (17.1968ms)
+  ✔ quando o filtro de status é inválido, então devolve 400 (5.5014ms)
+  ✔ quando pesquisa um termo, então encontra no título ou na descrição (24.4428ms)
+  ✔ quando a busca contém injeção de SQL, então trata como texto e não devolve tudo (11.4158ms)
+  ✔ quando a busca contém % ou _, então trata como caractere literal (18.9055ms)
+✔ Listagem e pesquisa (GET /api/tasks) (108.3733ms)
+▶ Consulta de uma tarefa (GET /api/tasks/:id)
+  ✔ quando o ID existe, então devolve a tarefa (11.1988ms)
+  ✔ quando o ID não existe, então devolve 404 (5.3109ms)
+  ✔ quando o ID não é inteiro positivo, então devolve 400 (18.3009ms)
+✔ Consulta de uma tarefa (GET /api/tasks/:id) (35.2299ms)
+▶ Edição de tarefa (PUT /api/tasks/:id)
+  ✔ quando os dados são válidos, então atualiza e devolve a tarefa (12.2954ms)
+  ✔ quando a tarefa já tem prazo no passado, então a edição mantém o prazo (regra só vale no cadastro) (12.7828ms)
+  ✔ quando os dados são inválidos, então devolve 400 e não altera o banco (10.2629ms)
+  ✔ quando o ID não existe, então devolve 404 (6.1794ms)
+✔ Edição de tarefa (PUT /api/tasks/:id) (41.925ms)
+▶ Alteração de status (PATCH /api/tasks/:id/status)
+  ✔ quando marca como concluída, então grava o status (10.4539ms)
+  ✔ quando reabre uma tarefa concluída, então volta a pendente (12.0414ms)
+  ✔ quando o usuário clica 2 vezes em "Concluir" ao mesmo tempo, então a tarefa termina concluída (12.188ms)
+  ✔ quando o status é inválido ou não é informado, então devolve 400 (13.7748ms)
+  ✔ quando o ID não existe, então devolve 404 (4.8811ms)
+✔ Alteração de status (PATCH /api/tasks/:id/status) (53.8554ms)
+▶ Exclusão de tarefa (DELETE /api/tasks/:id)
+  ✔ quando o ID existe, então remove e devolve 204 (15.1335ms)
+  ✔ quando a mesma exclusão é enviada 2 vezes ao mesmo tempo, então uma remove (204) e a outra recebe 404 (12.6823ms)
+  ✔ quando o ID não existe, então devolve 404 (4.6778ms)
+✔ Exclusão de tarefa (DELETE /api/tasks/:id) (32.8029ms)
+▶ Segurança da aplicação
+  ✔ quando a página é servida, então envia cabeçalhos de segurança e não expõe X-Powered-By (11.756ms)
+  ✔ quando acessa uma rota de API inexistente, então devolve 404 em JSON (5.0608ms)
+  ✔ quando ocorre um erro interno, então devolve mensagem genérica sem stack (7.0918ms)
+✔ Segurança da aplicação (24.3406ms)
+ℹ tests 45
+ℹ suites 7
+ℹ pass 45
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1384.5978
