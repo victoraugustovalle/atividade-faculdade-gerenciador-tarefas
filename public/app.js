@@ -35,8 +35,11 @@ function formatarData(iso) {
   return `${d}/${m}/${a}`;
 }
 
+// Data local (AAAA-MM-DD). toISOString() usaria UTC e, à noite no Brasil, já seria "amanhã".
 function hoje() {
-  return new Date().toISOString().slice(0, 10);
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
 // Validação do formulário
@@ -63,6 +66,7 @@ async function carregar() {
   if (busca.value.trim()) params.set('q', busca.value.trim());
   try {
     const resp = await fetch(API + '?' + params);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const tarefas = await resp.json();
     renderizar(tarefas);
   } catch (e) {
@@ -70,31 +74,63 @@ async function carregar() {
   }
 }
 
+function criar(tag, classe, texto) {
+  const el = document.createElement(tag);
+  if (classe) el.className = classe;
+  if (texto !== undefined) el.textContent = texto;
+  return el;
+}
+
+function botao(texto, acao, id, extra) {
+  const b = criar('button', 'btn pequeno' + (extra ? ' ' + extra : ''), texto);
+  b.type = 'button';
+  b.dataset.acao = acao;
+  b.dataset.id = id;
+  return b;
+}
+
+// Monta a lista com textContent: o conteúdo digitado pelo usuário nunca é interpretado como HTML.
 function renderizar(tarefas) {
   vazio.hidden = tarefas.length > 0;
-  lista.innerHTML = tarefas
-    .map((t) => {
+  lista.replaceChildren(
+    ...tarefas.map((t) => {
       const atrasada = t.status === 'pendente' && t.due_date && t.due_date < hoje();
-      return `
-      <li class="tarefa ${t.priority} ${t.status}">
-        <div>
-          <p class="tarefa-titulo">${t.title}</p>
-          ${t.description ? `<p class="tarefa-desc">${t.description}</p>` : ''}
-          <div class="tarefa-meta">
-            <span class="selo">Prioridade: ${nomesPrioridade[t.priority] || t.priority}</span>
-            ${t.due_date ? `<span class="selo ${atrasada ? 'atrasada' : ''}">Prazo: ${formatarData(t.due_date)}${atrasada ? ' (atrasada)' : ''}</span>` : ''}
-            <span class="selo">${t.status === 'concluida' ? 'Concluída' : 'Pendente'}</span>
-          </div>
-        </div>
-        <div class="tarefa-acoes">
-          <button class="btn pequeno" onclick="alternarStatus(${t.id})">${t.status === 'pendente' ? 'Concluir' : 'Reabrir'}</button>
-          <button class="btn pequeno" onclick="editar(${t.id})">Editar</button>
-          <button class="btn pequeno perigo" onclick="excluir(${t.id})">Excluir</button>
-        </div>
-      </li>`;
+      const li = criar('li', 'tarefa');
+      li.classList.add(t.priority, t.status);
+
+      const info = criar('div');
+      info.append(criar('p', 'tarefa-titulo', t.title));
+      if (t.description) info.append(criar('p', 'tarefa-desc', t.description));
+      const meta = criar('div', 'tarefa-meta');
+      meta.append(criar('span', 'selo', 'Prioridade: ' + (nomesPrioridade[t.priority] || t.priority)));
+      if (t.due_date) {
+        meta.append(
+          criar('span', 'selo' + (atrasada ? ' atrasada' : ''), 'Prazo: ' + formatarData(t.due_date) + (atrasada ? ' (atrasada)' : ''))
+        );
+      }
+      meta.append(criar('span', 'selo', t.status === 'concluida' ? 'Concluída' : 'Pendente'));
+      info.append(meta);
+
+      const acoes = criar('div', 'tarefa-acoes');
+      acoes.append(
+        botao(t.status === 'pendente' ? 'Concluir' : 'Reabrir', t.status === 'pendente' ? 'concluir' : 'reabrir', t.id),
+        botao('Editar', 'editar', t.id),
+        botao('Excluir', 'excluir', t.id, 'perigo')
+      );
+      li.append(info, acoes);
+      return li;
     })
-    .join('');
+  );
 }
+
+lista.addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-acao]');
+  if (!b) return;
+  const id = Number(b.dataset.id);
+  if (b.dataset.acao === 'editar') editar(id);
+  else if (b.dataset.acao === 'excluir') excluir(id);
+  else alterarStatus(id, b.dataset.acao === 'concluir' ? 'concluida' : 'pendente');
+});
 
 function limparFormulario() {
   form.reset();
@@ -128,6 +164,7 @@ form.addEventListener('submit', async (e) => {
     });
     const corpo = await resp.json();
     if (!resp.ok) {
+      if (corpo.fields) exibirErros(corpo.fields);
       mostrarMensagem(corpo.error || 'Erro ao salvar a tarefa.', 'falha');
       return;
     }
@@ -160,8 +197,12 @@ async function editar(id) {
   form.scrollIntoView({ behavior: 'smooth' });
 }
 
-async function alternarStatus(id) {
-  const resp = await fetch(`${API}/${id}/status`, { method: 'PATCH' });
+async function alterarStatus(id, status) {
+  const resp = await fetch(`${API}/${id}/status`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
+  });
   if (!resp.ok) return mostrarMensagem('Não foi possível alterar o status.', 'falha');
   const t = await resp.json();
   mostrarMensagem(t.status === 'concluida' ? 'Tarefa concluída!' : 'Tarefa reaberta.', 'sucesso');
