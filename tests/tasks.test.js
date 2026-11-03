@@ -327,6 +327,13 @@ describe('Segurança da aplicação', () => {
     assert.equal(res.headers['strict-transport-security'], undefined);
   });
 
+  it('quando o health check é chamado, então responde ok sem devolver tarefas', async () => {
+    await criar();
+    const res = await api().get('/api/health');
+    assert.equal(res.status, 200);
+    assert.deepEqual(res.body, { ok: true });
+  });
+
   it('quando acessa uma rota de API inexistente, então devolve 404 em JSON', async () => {
     const res = await api().get('/api/nada');
     assert.equal(res.status, 404);

@@ -29,6 +29,11 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use('/api/tasks', (req, res, next) => (req.method === 'GET' || req.method === 'HEAD' ? next() : limiteEscritas(req, res, next)));
 app.use('/api/tasks', taskRoutes);
 
+// Health check do Render: responde sem consultar nem devolver tarefas
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true });
+});
+
 // Rotas de API inexistentes
 app.use('/api', (req, res) => {
   res.status(404).json({ error: 'Rota não encontrada.' });
