@@ -1,7 +1,7 @@
 # Gerenciador de Tarefas — Atividade 15 (Git + Desenvolvimento de Software com IA)
 
 > ## 🔗 Sistema publicado: **https://gerenciador-tarefas-ia.onrender.com**
-> Repositório: https://github.com/victoraugusto3215/gerenciador-tarefas-ia
+> Repositório: https://github.com/victoraugustovalle/gerenciador-tarefas-ia
 >
 > O plano gratuito do Render "adormece" o serviço após 15 minutos sem acesso. Por isso, o primeiro acesso pode levar cerca de 1 minuto para carregar.
 
@@ -68,7 +68,7 @@ Sistema web simples para **organizar tarefas pessoais**: o usuário cadastra o q
 Pré-requisito: **Node.js 22.13 ou superior** (`node -v`).
 
 ```bash
-git clone https://github.com/victoraugusto3215/gerenciador-tarefas-ia.git
+git clone https://github.com/victoraugustovalle/gerenciador-tarefas-ia.git
 cd gerenciador-tarefas-ia
 npm install
 npm start
