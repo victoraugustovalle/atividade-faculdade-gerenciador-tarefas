@@ -34,7 +34,7 @@ Cada etapa abaixo corresponde a um ou mais commits, e o histórico (`git log`) m
 
 **Estrutura e stack:** Node + Express + SQLite. Esta opção foi escolhida em vez de um site estático com `localStorage` porque o servidor permite aplicar de verdade os prompts de segurança (validar no servidor) e de testes de integração (bater na rota real).
 
-**Proposta revisada:** login de usuários foi descartado, porque não é exigido e eu não conseguiria demonstrar e testar bem no prazo. Fica como limitação documentada.
+**Proposta revisada:** login de usuários foi descartado, porque não é exigido pelo enunciado e não haveria tempo para implementá-lo e testá-lo adequadamente dentro do prazo. Fica como limitação documentada.
 
 ## Etapa 2 — Problemas encontrados no desenvolvimento e como foram corrigidos
 
@@ -209,4 +209,4 @@ Nenhum teste foi apagado, pulado ou afrouxado.
 
 **O que precisou ser corrigido:** a primeira versão "funcionava", mas tinha falhas sérias que só apareceram na auditoria: SQL Injection, XSS, validação apenas no navegador, vazamento de stack e o bug do fuso horário. Durante a refatoração, uma mudança aparentemente inofensiva (mover a busca de arquivo) quebrou a pesquisa, e foram os testes que pegaram isso na hora.
 
-**O que aprendi:** código gerado por IA precisa ser lido e testado, não apenas executado. Validação no front é para usabilidade; a regra de verdade tem que estar no servidor (e, se possível, no banco). Testes de integração que batem na rota real são o que dá segurança para refatorar e para aceitar novas sugestões da IA: depois de qualquer alteração, `npm test`.
+**Aprendizados:** código gerado por IA precisa ser lido e testado, não apenas executado. Validação no front é para usabilidade; a regra de verdade tem que estar no servidor (e, se possível, no banco). Testes de integração que batem na rota real são o que dá segurança para refatorar e para aceitar novas sugestões da IA: depois de qualquer alteração, `npm test`.

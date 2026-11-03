@@ -1,10 +1,10 @@
 # AUDITORIA.md — Gerenciador de Tarefas
 
-Este é o relatório da auditoria que fiz com o **Prompt 4** na primeira versão do sistema (commit `5b30ede`), antes de qualquer correção.
+Relatório da auditoria realizada com o **Prompt 4** na primeira versão do sistema (commit `5b30ede`), antes de qualquer correção.
 
-Seguindo a regra do prompt, nesta etapa eu não alterei nenhum arquivo, não rodei migration e não instalei nada. Só li o código e fiz requisições de teste contra um servidor local com banco em memória (`DB_PATH=:memory:`), sem tocar em dados reais.
+Conforme a regra do prompt, nesta etapa nenhum arquivo foi alterado, nenhuma migration foi executada e nada foi instalado. A análise se limitou à leitura do código e a requisições de teste contra um servidor local com banco em memória (`DB_PATH=:memory:`), sem acesso a dados reais.
 
-**O que analisei:** `server.js` (API e banco), `public/app.js` (front-end), `public/index.html` e `public/style.css`.
+**Arquivos analisados:** `server.js` (API e banco), `public/app.js` (front-end), `public/index.html` e `public/style.css`.
 **Tecnologias:** Node.js 24, Express 4, SQLite nativo (`node:sqlite`) e front-end em HTML, CSS e JS puro.
 
 ---
@@ -105,10 +105,10 @@ O SQLite (`node:sqlite`) é síncrono e o Node executa cada handler sem intercal
 
 ## Conclusão e próximos passos
 
-Decidi começar pelo **Prompt 1 (segurança)**. O SQL Injection e o XSS poderiam ser explorados por qualquer pessoa assim que o sistema fosse publicado, e, sem validação no servidor, o banco aceitava qualquer dado.
+A prioridade definida foi o **Prompt 1 (segurança)**. O SQL Injection e o XSS poderiam ser explorados por qualquer pessoa assim que o sistema fosse publicado, e, sem validação no servidor, o banco aceitava qualquer dado.
 
-Depois vem o **Prompt 3**, para ter testes que garantam que essas correções não voltem a quebrar. Por último, o **Prompt 2**, para reorganizar o `server.js` já com os testes cobrindo o comportamento.
+Em seguida, o **Prompt 3**, para criar testes que garantam que essas correções não voltem a quebrar. Por último, o **Prompt 2**, para reorganizar o `server.js` já com os testes cobrindo o comportamento.
 
 ---
 
-> **Atualização:** depois desta auditoria, corrigi os achados com os Prompts 1, 3 e 2, nessa ordem. Com o sistema já publicado, rodei o Prompt 1 mais uma vez, e os resultados estão em [docs/PROMPTS.md](docs/PROMPTS.md#segunda-rodada-do-prompt-1-com-o-sistema-já-publicado). Deixei este relatório como estava no dia da auditoria, para mostrar o ponto de partida do projeto.
+> **Atualização:** após esta auditoria, os achados foram corrigidos com os Prompts 1, 3 e 2, nessa ordem. Com o sistema já publicado, o Prompt 1 foi executado mais uma vez, e os resultados estão registrados em [docs/PROMPTS.md](docs/PROMPTS.md#segunda-rodada-do-prompt-1-com-o-sistema-já-publicado). Este relatório foi mantido como estava no dia da auditoria, para registrar o ponto de partida do projeto.
