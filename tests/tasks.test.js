@@ -19,6 +19,7 @@ const criar = (extra) => api().post('/api/tasks').send(tarefaValida(extra));
 
 beforeEach(() => {
   app.db.exec("DELETE FROM tasks; DELETE FROM sqlite_sequence WHERE name = 'tasks';");
+  app.limiteEscritas.reset();
 });
 
 describe('Cadastro de tarefa (POST /api/tasks)', () => {
@@ -334,5 +335,30 @@ describe('Segurança da aplicação', () => {
     }
     assert.equal(res.status, 500);
     assert.deepEqual(res.body, { error: 'Erro interno do servidor.' });
+  });
+});
+
+describe('Limite de requisições de escrita', () => {
+  // O IP vem do X-Forwarded-For, como acontece atrás do proxy do Render
+  const deIp = (ip) => api().post('/api/tasks').set('X-Forwarded-For', ip).send(tarefaValida());
+
+  it('quando o mesmo IP passa de 60 escritas no minuto, então devolve 429 e não grava a tarefa', async () => {
+    for (let i = 0; i < 60; i++) assert.equal((await deIp('203.0.113.1')).status, 201);
+    const res = await deIp('203.0.113.1');
+    assert.equal(res.status, 429);
+    assert.equal(res.body.error, 'Muitas requisições. Tente novamente em instantes.');
+    assert.ok(Number(res.headers['retry-after']) > 0);
+    assert.equal(app.db.prepare('SELECT COUNT(*) AS n FROM tasks').get().n, 60);
+  });
+
+  it('quando um IP atinge o limite, então outro IP continua podendo gravar', async () => {
+    for (let i = 0; i < 61; i++) await deIp('203.0.113.1');
+    assert.equal((await deIp('203.0.113.2')).status, 201);
+  });
+
+  it('quando o IP atinge o limite, então as leituras continuam liberadas', async () => {
+    for (let i = 0; i < 61; i++) await deIp('203.0.113.1');
+    const res = await api().get('/api/tasks').set('X-Forwarded-For', '203.0.113.1');
+    assert.equal(res.status, 200);
   });
 });

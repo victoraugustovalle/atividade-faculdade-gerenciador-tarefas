@@ -1,10 +1,16 @@
 const express = require('express');
 const path = require('path');
 const taskRoutes = require('./tasks/taskRoutes');
+const { limitarRequisicoes } = require('./rateLimit');
+const { LIMITE_ESCRITAS_POR_MINUTO } = require('./config');
+
+const limiteEscritas = limitarRequisicoes({ max: LIMITE_ESCRITAS_POR_MINUTO, janelaMs: 60 * 1000 });
 
 const app = express();
 
 app.disable('x-powered-by');
+// O Render fica na frente do app como proxy: confia só no primeiro salto para obter o IP real do visitante
+app.set('trust proxy', 1);
 app.use((req, res, next) => {
   res.set({
     'X-Content-Type-Options': 'nosniff',
@@ -17,6 +23,8 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '10kb' }));
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
+// Leituras ficam livres; só as escritas contam para o limite
+app.use('/api/tasks', (req, res, next) => (req.method === 'GET' || req.method === 'HEAD' ? next() : limiteEscritas(req, res, next)));
 app.use('/api/tasks', taskRoutes);
 
 // Rotas de API inexistentes
@@ -37,3 +45,4 @@ app.use((err, req, res, next) => {
 });
 
 module.exports = app;
+module.exports.limiteEscritas = limiteEscritas;
