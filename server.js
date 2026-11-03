@@ -1,25 +1,11 @@
 const express = require('express');
 const path = require('path');
-const { DatabaseSync } = require('node:sqlite');
-const { PORT, DB_PATH } = require('./src/config');
-const { STATUS, TITULO_MIN, TITULO_MAX, DESCRICAO_MAX, validarTarefa, idValido } = require('./src/tasks/taskValidation');
+const { PORT } = require('./src/config');
+const db = require('./src/db');
+const repo = require('./src/tasks/taskRepository');
+const { STATUS, TITULO_MAX, validarTarefa, idValido } = require('./src/tasks/taskValidation');
 
 const app = express();
-
-// Banco de dados (CHECK garante as regras mesmo se alguém gravar sem passar pela API)
-const db = new DatabaseSync(DB_PATH);
-db.exec(`
-  CREATE TABLE IF NOT EXISTS tasks (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL CHECK (length(trim(title)) BETWEEN ${TITULO_MIN} AND ${TITULO_MAX}),
-    description TEXT NOT NULL DEFAULT '' CHECK (length(description) <= ${DESCRICAO_MAX}),
-    priority TEXT NOT NULL DEFAULT 'media' CHECK (priority IN ('baixa', 'media', 'alta')),
-    due_date TEXT CHECK (due_date IS NULL OR date(due_date) = due_date),
-    status TEXT NOT NULL DEFAULT 'pendente' CHECK (status IN ('pendente', 'concluida')),
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-  )
-`);
 
 app.disable('x-powered-by');
 app.use((req, res, next) => {
@@ -43,26 +29,14 @@ app.param('id', (req, res, next, id) => {
 // Listar tarefas (com filtro opcional por status e busca)
 app.get('/api/tasks', (req, res) => {
   const { status, q } = req.query;
-  let sql = 'SELECT * FROM tasks WHERE 1=1';
-  const params = [];
-  if (status) {
-    if (!STATUS.includes(status)) return res.status(400).json({ error: 'Status inválido.' });
-    sql += ' AND status = ?';
-    params.push(status);
-  }
-  if (q) {
-    if (typeof q !== 'string' || q.length > TITULO_MAX) return res.status(400).json({ error: 'Busca inválida.' });
-    const termo = '%' + q.replace(/[\\%_]/g, '\\$&') + '%';
-    sql += " AND (title LIKE ? ESCAPE '\\' OR description LIKE ? ESCAPE '\\')";
-    params.push(termo, termo);
-  }
-  sql += ' ORDER BY status DESC, due_date IS NULL, due_date ASC, id DESC';
-  res.json(db.prepare(sql).all(...params));
+  if (status && !STATUS.includes(status)) return res.status(400).json({ error: 'Status inválido.' });
+  if (q && (typeof q !== 'string' || q.length > TITULO_MAX)) return res.status(400).json({ error: 'Busca inválida.' });
+  res.json(repo.listar({ status, q }));
 });
 
 // Consultar uma tarefa
 app.get('/api/tasks/:id', (req, res) => {
-  const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(req.params.id);
+  const task = repo.buscarPorId(req.params.id);
   if (!task) return res.status(404).json({ error: 'Tarefa não encontrada.' });
   res.json(task);
 });
@@ -71,22 +45,15 @@ app.get('/api/tasks/:id', (req, res) => {
 app.post('/api/tasks', (req, res) => {
   const { dados, erros } = validarTarefa(req.body, { criando: true });
   if (erros) return res.status(400).json({ error: Object.values(erros)[0], fields: erros });
-  const result = db
-    .prepare('INSERT INTO tasks (title, description, priority, due_date, status) VALUES (?, ?, ?, ?, ?)')
-    .run(dados.title, dados.description, dados.priority, dados.due_date, dados.status);
-  res.status(201).json(db.prepare('SELECT * FROM tasks WHERE id = ?').get(result.lastInsertRowid));
+  res.status(201).json(repo.criar(dados));
 });
 
 // Editar tarefa
 app.put('/api/tasks/:id', (req, res) => {
-  const existing = db.prepare('SELECT * FROM tasks WHERE id = ?').get(req.params.id);
-  if (!existing) return res.status(404).json({ error: 'Tarefa não encontrada.' });
+  if (!repo.buscarPorId(req.params.id)) return res.status(404).json({ error: 'Tarefa não encontrada.' });
   const { dados, erros } = validarTarefa(req.body, { criando: false });
   if (erros) return res.status(400).json({ error: Object.values(erros)[0], fields: erros });
-  db.prepare(
-    "UPDATE tasks SET title = ?, description = ?, priority = ?, due_date = ?, status = ?, updated_at = datetime('now') WHERE id = ?"
-  ).run(dados.title, dados.description, dados.priority, dados.due_date, dados.status, req.params.id);
-  res.json(db.prepare('SELECT * FROM tasks WHERE id = ?').get(req.params.id));
+  res.json(repo.atualizar(req.params.id, dados));
 });
 
 // Definir status (idempotente: o cliente informa o status desejado)
@@ -95,17 +62,14 @@ app.patch('/api/tasks/:id/status', (req, res) => {
   if (!STATUS.includes(status)) {
     return res.status(400).json({ error: 'Status inválido. Use pendente ou concluida.' });
   }
-  const result = db
-    .prepare("UPDATE tasks SET status = ?, updated_at = datetime('now') WHERE id = ?")
-    .run(status, req.params.id);
-  if (result.changes === 0) return res.status(404).json({ error: 'Tarefa não encontrada.' });
-  res.json(db.prepare('SELECT * FROM tasks WHERE id = ?').get(req.params.id));
+  const task = repo.definirStatus(req.params.id, status);
+  if (!task) return res.status(404).json({ error: 'Tarefa não encontrada.' });
+  res.json(task);
 });
 
 // Excluir tarefa
 app.delete('/api/tasks/:id', (req, res) => {
-  const result = db.prepare('DELETE FROM tasks WHERE id = ?').run(req.params.id);
-  if (result.changes === 0) return res.status(404).json({ error: 'Tarefa não encontrada.' });
+  if (!repo.excluir(req.params.id)) return res.status(404).json({ error: 'Tarefa não encontrada.' });
   res.status(204).end();
 });
 
