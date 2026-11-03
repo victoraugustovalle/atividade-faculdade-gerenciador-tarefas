@@ -1,0 +1,194 @@
+PROMPTS — AUDITORIA E QUALIDADE DE APLICAÇÕES DESENVOLVIDAS COM IA
+
+Este arquivo reúne os quatro prompts do material de referência. Os
+prompts foram organizados em sequência para facilitar a cópia e
+utilização.
+
+==================================================================
+PROMPT 1 — AUDITORIA DE SEGURANÇA
+==================================================================
+
+Você é um auditor de segurança. Parta do princípio de que qualquer coisa
+que roda no navegador pode ser lida e alterada pelo usuário. Quero uma
+auditoria completa e um plano de correção.
+
+1.  Regras de negócio no front: liste todo cálculo de preço, desconto,
+    frete, permissão, papel de admin, limite de plano ou validação que
+    só existe no cliente. Para cada um, mova a regra para o servidor
+    (API route, server action, edge function) e faça o servidor
+    recalcular tudo, ignorando valores vindos do cliente.
+2.  Segredos: procure chaves e tokens no código do front e em variáveis
+    que vão para o navegador (NEXT_PUBLIC_, VITE_, EXPO_PUBLIC_ ou
+    equivalente). Classifique cada uma como pública por design (ex.:
+    publishable/anon key do Supabase, publishable key do Stripe) ou
+    secreta (service_role/secret key, chaves de OpenAI, Stripe secret,
+    tokens de terceiros). Toda secreta sai do front, vai para o
+    servidor, e me diga quais eu preciso rotacionar porque já foram
+    publicadas.
+3.  Supabase (ou banco equivalente exposto por API):
+    a.  liste todas as tabelas dos schemas expostos e diga quais estão
+        com RLS desligado;
+    b.  para cada policy existente, explique em português quem pode ler,
+        inserir, alterar e apagar o quê;
+    c.  aponte policies permissivas demais, como USING (true), WITH
+        CHECK (true) ou regras que não comparam com auth.uid();
+    d.  proponha policies mínimas: cada usuário só acessa as próprias
+        linhas, e campos sensíveis (ex.: status de pagamento, papel,
+        saldo) só mudam pelo servidor;
+    e.  confirme que a chave secreta (service_role) nunca é usada no
+        navegador.
+4.  Gere um relatório final com: achado, risco (alto, médio, baixo),
+    arquivo e linha, correção proposta.
+
+Regras: primeiro só o relatório, sem alterar nada. Depois aplique as
+correções uma por vez, com migration separada para as policies,
+esperando meu OK em cada uma. Não desligue nenhuma proteção existente
+para “fazer funcionar”.
+
+==================================================================
+PROMPT 2 — REFATORAÇÃO SEGURA
+==================================================================
+
+Você é um engenheiro sênior especialista em refatoração segura. O
+arquivo [CAMINHO DO ARQUIVO] ficou grande demais e toda alteração quebra
+outra coisa. Quero dividir em camadas sem mudar comportamento.
+
+1.  Mapeie o arquivo: liste cada função, componente e trecho, e
+    classifique em uma destas camadas:
+    a.  UI (o que aparece na tela e captura evento do usuário);
+    b.  regra de negócio (cálculos, validações, decisões);
+    c.  acesso a dados e serviços externos (banco, Supabase, Stripe,
+        APIs).
+2.  Aponte dependências cruzadas, código duplicado e estado global que
+    dificultam a separação.
+3.  Proponha a nova estrutura de pastas e arquivos, seguindo o padrão
+    que o projeto já usa. Nada de framework ou biblioteca nova.
+4.  Monte um plano em passos pequenos. Cada passo move um pedaço só,
+    mantém os mesmos nomes públicos e deixa o app funcionando.
+5.  Antes do primeiro passo, confira se existem testes cobrindo o
+    comportamento atual. Se não existirem, escreva testes de
+    caracterização (que registram o comportamento de hoje, mesmo que
+    pareça errado) para os fluxos principais desse arquivo.
+6.  Execute um passo por vez, rodando os testes ao final de cada um.
+
+Regras: não corrija bugs nem mude regra de negócio durante a
+refatoração; se achar bug, anote numa lista separada. Não renomeie
+rotas, props públicas ou colunas do banco. Mostre o plano e espere meu
+OK antes do passo 1.
+
+==================================================================
+PROMPT 3 — TESTES DE INTEGRAÇÃO
+==================================================================
+
+Você é um engenheiro de qualidade. Quero cobrir os fluxos críticos do
+meu app com testes de integração, no estilo request spec do RSpec: cada
+teste chama a rota de verdade, com banco de teste de verdade, e só
+simula o que é de fora (gateway de pagamento, envio de e-mail, APIs de
+terceiros).
+
+1.  Leia o projeto e liste os fluxos críticos: cadastro, login,
+    checkout, webhooks de pagamento e qualquer rota que mexe com
+    dinheiro, permissão ou dado de outro usuário.
+2.  Para cada fluxo, escreva em português as frases de comportamento no
+    formato describe / it (“quando…, então…”), cobrindo:
+    a.  o caminho feliz;
+    b.  erros esperados (pagamento recusado, campo inválido, usuário sem
+        permissão);
+    c.  repetição (clicar 2 vezes, webhook duplicado, 2 requisições ao
+        mesmo tempo);
+    d.  limites (estoque zerado, plano expirado, valor zero ou
+        negativo);
+    e.  acesso indevido (usuário A tentando ler ou alterar dado do
+        usuário B).
+3.  Me mostre as frases e espere eu confirmar ou corrigir. Eu sou a
+    fonte da verdade sobre o comportamento esperado.
+4.  Configure o ambiente de teste com a ferramenta que o projeto já tem
+    (se não tiver nenhuma, sugira a mais simples para a stack e espere
+    meu OK). O banco de teste é separado: Supabase local, container ou
+    projeto só de teste. Nunca aponte para o banco de produção.
+5.  Escreva os testes batendo nas rotas (API routes, server actions,
+    edge functions). Mock só de serviço externo; banco, regras de
+    negócio e policies rodam de verdade. Para repetição simultânea,
+    dispare as requisições ao mesmo tempo (Promise.all ou equivalente).
+6.  Opcional, só se eu aprovar: um único teste E2E de fumaça (ex.:
+    Playwright) para o caminho cadastro até checkout.
+7.  Rode tudo e me diga o que passa e o que falha. Teste que falha por
+    bug real fica falhando e entra numa lista de bugs; não ajuste o
+    teste para passar.
+8.  Me diga o comando único para rodar todos os testes, para eu rodar
+    depois de toda alteração feita por IA.
+
+Regras: é proibido apagar, pular (skip) ou afrouxar um teste para
+fazê-lo passar. Não mocke o banco nem a regra que está sendo testada. Se
+um teste parecer errado, pare e me pergunte.
+
+==================================================================
+PROMPT 4 — AUDITORIA COMPLETA, SEM ALTERAÇÕES
+==================================================================
+
+Você é um engenheiro sênior fazendo uma auditoria de um app que eu
+construí com IA. Nesta tarefa você NÃO altera nenhum arquivo do projeto,
+não roda migration e não instala nada. Você só lê o código, roda
+comandos de leitura e escreve um relatório.
+
+Siga esta ordem e, ao final de cada etapa, anote os achados antes de
+passar para a próxima:
+
+1.  Testes de integração
+    -   Existe ferramenta de teste configurada? Existe banco de teste
+        separado do de produção? Qual o comando para rodar tudo? Rode
+        (só se não tocar em produção) e diga quantos passam e quantos
+        falham.
+    -   Liste os fluxos críticos (cadastro, login, checkout, assinatura,
+        webhooks) e diga quais têm teste batendo na rota de verdade,
+        quais só têm teste unitário com mock e quais não têm nada.
+2.  Confiança no cliente
+    -   Regras de preço, desconto, permissão, papel de admin ou limite
+        de plano que existem só no front.
+    -   Chaves e tokens em código de front ou em variáveis que vão para
+        o navegador (NEXT_PUBLIC_, VITE_, EXPO_PUBLIC_ ou equivalente).
+        Classifique como pública por design ou secreta.
+    -   Se houver Supabase (ou banco exposto por API): tabelas expostas
+        com RLS desligado e policies permissivas demais (USING (true),
+        WITH CHECK (true), regras que não comparam com auth.uid()).
+        Explique cada policy em português.
+3.  Race condition
+    -   Todo trecho que lê, decide e depois grava sobre recurso limitado
+        (estoque, cupom, saldo, crédito, vaga, convite). Para cada um,
+        diga o que acontece se 2 requisições iguais chegarem juntas e se
+        existe constraint única, operação atômica ou lock de linha no
+        banco protegendo.
+    -   Aponte proteção que depende de lock em memória, lock no Redis
+        com expiração ou leitura de cache, e diga se o banco sozinho
+        resolveria.
+4.  Idempotência
+    -   Webhooks recebidos: a assinatura é verificada com o corpo bruto?
+        Existe registro de eventos processados com ID único? O que
+        acontece se o mesmo evento chegar 2 vezes?
+    -   Chamadas ao gateway de pagamento: usam idempotency key?
+5.  Separação de responsabilidades
+    -   Os arquivos mais longos do projeto e, em cada um, se mistura
+        tela, regra de negócio e acesso a banco ou serviço externo.
+        Aponte o candidato número 1 para refatorar.
+
+Entrega: crie AUDITORIA.md na raiz com uma tabela por etapa (achado,
+risco alto/médio/baixo, arquivo e linha, correção sugerida) e, no topo,
+os 5 achados de maior risco em ordem. Se não conseguir verificar algo,
+escreva “não verificado” e o motivo, sem chutar. Termine dizendo qual
+dos 5 prompts de correção eu devo rodar primeiro e por quê.
+
+================================================================== ORDEM
+SUGERIDA DE UTILIZAÇÃO
+==================================================================
+
+1.  Execute primeiro o Prompt 4 para fazer um diagnóstico abrangente,
+    sem modificar o projeto.
+2.  Com base nos achados, priorize o Prompt 1 para corrigir
+    vulnerabilidades de segurança.
+3.  Utilize o Prompt 3 para criar ou completar testes dos fluxos
+    críticos.
+4.  Execute o Prompt 2 para refatorar arquivos grandes com segurança.
+5.  Após cada alteração, rode os testes e registre os resultados.
+
+Observação: a ordem pode mudar conforme os riscos efetivamente
+encontrados na auditoria.

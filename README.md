@@ -14,6 +14,7 @@
 | **Aluno** | Victor Augusto |
 | **Turma** | 42C7 |
 | **Ferramenta de IA** | Claude Code (Anthropic), usado no VS Code |
+| **Enunciado da atividade** | [Atividade_Desenvolvimento_Sistema_com_IA.docx](docs/enunciado/Atividade_Desenvolvimento_Sistema_com_IA.docx) e [prompts_auditoria_qualidade_ia.txt](docs/enunciado/prompts_auditoria_qualidade_ia.txt), material disponibilizado pelo professor no Google Classroom |
 
 ## Objetivo
 
@@ -64,6 +65,7 @@ Sistema web simples para **organizar tarefas pessoais**: o usuário cadastra o q
 ├── tests/tasks.test.js        # 53 testes de integração
 ├── AUDITORIA.md               # relatório do Prompt 4
 └── docs/
+    ├── enunciado/             # enunciado e prompts disponibilizados pelo professor
     ├── PROMPTS.md             # registro dos 4 prompts: achados, decisões e relato
     └── evidencias/            # capturas de tela e saída dos testes
 ```
