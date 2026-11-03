@@ -475,15 +475,15 @@ test at tests\tasks.test.js:325:3
     {
   +   error: 'no such table: tasks',
   +   stack: 'Error: no such table: tasks\n' +
-  +     '    at C:\\Users\\victo\\AppData\\Local\\Temp\\claude\\c--Users-victo-Documents-Atv-15---QA\\292a7362-52fc-448c-9e7b-1bf0006d6a63\\scratchpad\\v1\\server.js:41:22\n' +
-  +     '    at Layer.handle [as handle_request] (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
-  +     '    at next (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
-  +     '    at Route.dispatch (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\route.js:119:3)\n' +
-  +     '    at Layer.handle [as handle_request] (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
-  +     '    at C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\index.js:284:15\n' +
-  +     '    at router.process_params (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
-  +     '    at next (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
-  +     '    at SendStream.error (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\serve-static\\index.js:121:7)\n' +
+  +     '    at <versao-inicial>\\server.js:41:22\n' +
+  +     '    at Layer.handle [as handle_request] (<projeto>\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+  +     '    at next (<projeto>\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+  +     '    at Route.dispatch (<projeto>\\node_modules\\express\\lib\\router\\route.js:119:3)\n' +
+  +     '    at Layer.handle [as handle_request] (<projeto>\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+  +     '    at <projeto>\\node_modules\\express\\lib\\router\\index.js:284:15\n' +
+  +     '    at router.process_params (<projeto>\\node_modules\\express\\lib\\router\\index.js:346:12)\n' +
+  +     '    at next (<projeto>\\node_modules\\express\\lib\\router\\index.js:280:10)\n' +
+  +     '    at SendStream.error (<projeto>\\node_modules\\serve-static\\index.js:121:7)\n' +
   +     '    at SendStream.emit (node:events:508:28)'
   -   error: 'Erro interno do servidor.'
     }
@@ -494,7 +494,7 @@ test at tests\tasks.test.js:325:3
       at async Suite.processPendingSubtests (node:internal/test_runner/test:788:7) {
     generatedMessage: true,
     code: 'ERR_ASSERTION',
-    actual: { error: 'no such table: tasks', stack: 'Error: no such table: tasks\n    at C:\\Users\\victo\\AppData\\Local\\Temp\\claude\\c--Users-victo-Documents-Atv-15---QA\\292a7362-52fc-448c-9e7b-1bf0006d6a63\\scratchpad\\v1\\server.js:41:22\n    at Layer.handle [as handle_request] (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at next (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\route.js:149:13)\n    at Route.dispatch (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\route.js:119:3)\n    at Layer.handle [as handle_request] (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\index.js:284:15\n    at router.process_params (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at SendStream.error (C:\\Users\\victo\\Documents\\Atv 15 - QA\\node_modules\\serve-static\\index.js:121:7)\n    at SendStream.emit (node:events:508:28)' },
+    actual: { error: 'no such table: tasks', stack: 'Error: no such table: tasks\n    at <versao-inicial>\\server.js:41:22\n    at Layer.handle [as handle_request] (<projeto>\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at next (<projeto>\\node_modules\\express\\lib\\router\\route.js:149:13)\n    at Route.dispatch (<projeto>\\node_modules\\express\\lib\\router\\route.js:119:3)\n    at Layer.handle [as handle_request] (<projeto>\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at <projeto>\\node_modules\\express\\lib\\router\\index.js:284:15\n    at router.process_params (<projeto>\\node_modules\\express\\lib\\router\\index.js:346:12)\n    at next (<projeto>\\node_modules\\express\\lib\\router\\index.js:280:10)\n    at SendStream.error (<projeto>\\node_modules\\serve-static\\index.js:121:7)\n    at SendStream.emit (node:events:508:28)' },
     expected: { error: 'Erro interno do servidor.' },
     operator: 'deepStrictEqual',
     diff: 'simple'
