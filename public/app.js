@@ -3,6 +3,7 @@ const API = '/api/tasks';
 const form = document.getElementById('task-form');
 const lista = document.getElementById('lista');
 const vazio = document.getElementById('vazio');
+const avisoLimite = document.getElementById('aviso-limite');
 const mensagem = document.getElementById('mensagem');
 const btnSalvar = document.getElementById('btn-salvar');
 const btnCancelar = document.getElementById('btn-cancelar');
@@ -69,6 +70,10 @@ async function carregar() {
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const tarefas = await resp.json();
     renderizar(tarefas);
+    // O servidor devolve no máximo 200 tarefas; o total real vem no cabeçalho
+    const total = Number(resp.headers.get('X-Total-Count')) || tarefas.length;
+    avisoLimite.hidden = total <= tarefas.length;
+    avisoLimite.textContent = `Mostrando ${tarefas.length} de ${total} tarefas. Use a busca ou o filtro para encontrar as demais.`;
   } catch (e) {
     mostrarMensagem('Não foi possível carregar as tarefas.', 'falha');
   }

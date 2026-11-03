@@ -5,21 +5,28 @@ function buscarPorId(id) {
   return db.prepare('SELECT * FROM tasks WHERE id = ?').get(id);
 }
 
+// Máximo de tarefas devolvidas por listagem, para a resposta não crescer sem limite
+const LISTAGEM_MAX = 200;
+
+// Retorna { tarefas, total }: no máximo LISTAGEM_MAX tarefas e o total que atende ao filtro
 function listar({ status, q } = {}) {
-  let sql = 'SELECT * FROM tasks WHERE 1=1';
+  let where = ' WHERE 1=1';
   const params = [];
   if (status) {
-    sql += ' AND status = ?';
+    where += ' AND status = ?';
     params.push(status);
   }
   if (q) {
     // Parâmetros + ESCAPE: o termo é sempre tratado como texto (sem SQL Injection, % e _ literais)
     const termo = '%' + q.replace(/[\\%_]/g, '\\$&') + '%';
-    sql += " AND (title LIKE ? ESCAPE '\\' OR description LIKE ? ESCAPE '\\')";
+    where += " AND (title LIKE ? ESCAPE '\\' OR description LIKE ? ESCAPE '\\')";
     params.push(termo, termo);
   }
-  sql += ' ORDER BY status DESC, due_date IS NULL, due_date ASC, id DESC';
-  return db.prepare(sql).all(...params);
+  const tarefas = db
+    .prepare('SELECT * FROM tasks' + where + ' ORDER BY status DESC, due_date IS NULL, due_date ASC, id DESC LIMIT ?')
+    .all(...params, LISTAGEM_MAX);
+  const { total } = db.prepare('SELECT COUNT(*) AS total FROM tasks' + where).get(...params);
+  return { tarefas, total };
 }
 
 function criar(dados) {
@@ -47,4 +54,4 @@ function excluir(id) {
   return db.prepare('DELETE FROM tasks WHERE id = ?').run(id).changes > 0;
 }
 
-module.exports = { buscarPorId, listar, criar, atualizar, definirStatus, excluir };
+module.exports = { LISTAGEM_MAX, buscarPorId, listar, criar, atualizar, definirStatus, excluir };

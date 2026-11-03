@@ -11,12 +11,14 @@ router.param('id', (req, res, next, id) => {
   next();
 });
 
-// Listar tarefas (com filtro opcional por status e busca)
+// Listar tarefas (com filtro opcional por status e busca). O total real vai no cabeçalho X-Total-Count.
 router.get('/', (req, res) => {
   const { status, q } = req.query;
   if (status && !STATUS.includes(status)) return res.status(400).json({ error: 'Status inválido.' });
   if (q && (typeof q !== 'string' || q.length > TITULO_MAX)) return res.status(400).json({ error: 'Busca inválida.' });
-  res.json(repo.listar({ status, q }));
+  const { tarefas, total } = repo.listar({ status, q });
+  res.set('X-Total-Count', String(total));
+  res.json(tarefas);
 });
 
 // Consultar uma tarefa

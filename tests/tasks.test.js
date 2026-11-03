@@ -193,6 +193,23 @@ describe('Listagem e pesquisa (GET /api/tasks)', () => {
     assert.deepEqual(res.body, []);
   });
 
+  it('quando há mais de 200 tarefas, então devolve só 200 e informa o total no cabeçalho', async () => {
+    // Inserção direta no banco: 201 POSTs esbarrariam no limite de escritas por IP
+    const inserir = app.db.prepare("INSERT INTO tasks (title, due_date) VALUES (?, '2099-12-31')");
+    for (let i = 1; i <= 201; i++) inserir.run('Tarefa ' + i);
+    const res = await api().get('/api/tasks');
+    assert.equal(res.status, 200);
+    assert.equal(res.body.length, 200);
+    assert.equal(res.headers['x-total-count'], '201');
+  });
+
+  it('quando filtra, então o total do cabeçalho considera só as tarefas do filtro', async () => {
+    await criar({ title: 'Aberta' });
+    await criar({ title: 'Fechada', status: 'concluida' });
+    const res = await api().get('/api/tasks?status=concluida');
+    assert.equal(res.headers['x-total-count'], '1');
+  });
+
   it('quando a busca contém % ou _, então trata como caractere literal', async () => {
     await criar({ title: 'Meta 100% concluída' });
     await criar({ title: 'Outra tarefa' });
