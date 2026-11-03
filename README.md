@@ -1,7 +1,7 @@
 # [ATIVIDADE ACADÊMICA] Gerenciador de Tarefas — Atividade 15 da faculdade
 
 > [!IMPORTANT]
-> **📚 Atividade acadêmica da faculdade**, desenvolvida conforme solicitação do professor na disciplina de Git + Desenvolvimento de Software com IA.
+> **📚 Atividade acadêmica da faculdade**, desenvolvida conforme solicitação do professor na disciplina de Qualidade de Software.
 > O código foi publicado aqui porque a entrega pelo GitHub fazia parte do enunciado. O tema, o escopo e as etapas seguem o que a atividade pediu.
 
 > ## 🔗 Sistema publicado: **https://atividade-faculdade-gerenciador-tarefas.onrender.com**
