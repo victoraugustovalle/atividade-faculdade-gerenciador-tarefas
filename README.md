@@ -127,7 +127,7 @@ npm test
 - **53 testes de integração** no estilo *request spec*: cada teste chama a rota HTTP real, com banco SQLite real **em memória**. O banco de produção nunca é usado, e há uma trava no início do arquivo de teste que aborta se o banco não for o de memória.
 - Nada é mockado: banco, validação e regras rodam de verdade. O sistema não tem serviços externos, então não há o que simular.
 - Cobrem o caminho feliz, os erros esperados, a repetição (clique duplo e requisições simultâneas com `Promise.all`), os limites (3 e 100 caracteres, prazo hoje, 10 kb) e a segurança (SQL Injection, XSS, cabeçalhos e HSTS, erro interno sem stack, limite de escritas por IP).
-- **Resultado atual: 53 passam, 0 falham.** Os mesmos testes rodados contra a versão inicial gerada pela IA: **22 falham** (veja `docs/evidencias/`).
+- **Resultado atual: 53 passam, 0 falham.** Os 45 testes da primeira versão da suíte, rodados contra a versão inicial gerada pela IA: **22 falham** (veja `docs/evidencias/`).
 
 Os cenários detalhados estão em [docs/PROMPTS.md](docs/PROMPTS.md#prompt-3--testes-de-integração).
 
@@ -162,6 +162,7 @@ O arquivo `render.yaml` já descreve o serviço. No Render: **New → Blueprint*
 | 2 | Prompt 1: segurança | Todos os achados de risco alto e médio corrigidos no commit `fix(segurança)` |
 | 3 | Prompt 3: testes de integração | 45 testes; 22 deles teriam falhado na versão inicial |
 | 4 | Prompt 2: refatoração segura | `server.js` dividido em 6 módulos em 4 passos, com os testes verdes em todos os passos |
+| 5 | Prompt 1 de novo, após o deploy | Dependências atualizadas (0 vulnerabilidades), limite de requisições, HSTS, health check e limite da listagem; 53 testes |
 
 O registro completo (achados, riscos, decisões, bugs anotados e relato) está em **[docs/PROMPTS.md](docs/PROMPTS.md)**. O histórico de commits mostra cada etapa separadamente.
 
@@ -169,3 +170,4 @@ O registro completo (achados, riscos, decisões, bugs anotados e relato) está e
 
 - Não há login: é um sistema de usuário único, e quem tiver o link pode editar as tarefas. A decisão está registrada na auditoria.
 - No Render Free, os dados são apagados em reinícios e deploys (disco efêmero).
+- O limite de requisições fica na memória do servidor: ele zera quando o serviço reinicia e conta por instância. No plano gratuito há uma instância só.

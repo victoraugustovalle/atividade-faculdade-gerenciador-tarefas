@@ -10,6 +10,7 @@ Cada etapa abaixo corresponde a um ou mais commits, e o histórico (`git log`) m
 | `fix(segurança)…` | Prompt 1: correções de segurança |
 | `test: testes de integração…` | Prompt 3: testes de integração |
 | `refactor(passo 1…4)` | Prompt 2: refatoração segura em 4 passos |
+| `fix(segurança)` (5 commits após o deploy) | Prompt 1, segunda rodada, com o sistema já publicado |
 
 ---
 
@@ -90,6 +91,26 @@ Também: nenhum teste automatizado, ausência de cabeçalhos de segurança e `se
 
 **Verificação:** as mesmas requisições maliciosas da auditoria foram repetidas depois da correção. Todas passaram a responder 400 ou foram tratadas como texto.
 
+### Segunda rodada do Prompt 1 (com o sistema já publicado)
+
+Depois do deploy no Render, o Prompt 1 foi executado de novo sobre o código atual, porque um sistema acessível pela internet muda o peso de alguns riscos. Primeiro veio só o relatório; depois, uma correção por vez, cada uma com o próprio commit, os testes rodando e aprovação antes de seguir.
+
+**Confirmado nesta rodada:** todas as regras do front também existem no servidor. Os campos `id`, `created_at` e `updated_at` enviados pelo cliente são ignorados. Parâmetros repetidos na URL respondem 400. Tentativas de baixar o banco (`/../data/tasks.db`) respondem 404. Não há segredos em nenhum commit do histórico.
+
+| # | Achado | Risco | Decisão |
+|:-:|---|:-:|---|
+| 1 | Sem autenticação: com o sistema público, qualquer pessoa com o link pode alterar as tarefas | Alto | ❌ Não aplicado. Login não faz parte do enunciado e mudaria o escopo da atividade. Fica como limitação documentada |
+| 2 | Dependências com vulnerabilidades de negação de serviço (`body-parser`, `path-to-regexp`, `qs`, via `express@4.21.2`) | Alto | ✅ `npm audit fix`: express 4.22.3, **0 vulnerabilidades** |
+| 3 | Sem limite de requisições: um script poderia encher o banco | Médio | ✅ 60 escritas por minuto por IP (resposta 429), sem biblioteca nova |
+| 4 | Listagem sem limite de tamanho | Baixo | ✅ No máximo 200 tarefas por resposta, com o total no cabeçalho `X-Total-Count` e aviso na tela |
+| 5 | Prazo no passado é aceito na edição | Baixo | ❌ Mantido. É regra de negócio, não falha de segurança, e é igual no front e no servidor (já anotado no Prompt 2) |
+| 6 | Falta o cabeçalho HSTS | Baixo | ✅ `Strict-Transport-Security` enviado nas respostas por HTTPS |
+| 7 | O health check do Render listava todas as tarefas | Baixo | ✅ Nova rota `/api/health` |
+| 8 | O selo "atrasada" usa o relógio do navegador | Baixo | ❌ Mantido. Só afeta a exibição |
+
+**Testes:** 8 testes novos (limite de escritas, HSTS, health check e limite da listagem). Resultado: **53 passam, 0 falham.**
+**Nenhuma proteção existente foi desligada** (CSP, CHECKs, validação e limite de 10 kb continuam iguais).
+
 ## Prompt 3 — Testes de integração
 
 **Ferramenta:** o projeto não tinha nenhuma. Foi escolhida a opção mais simples para a stack: `node:test` (já vem no Node) + `supertest` (chama as rotas do Express).
@@ -127,6 +148,7 @@ Também: nenhum teste automatizado, ausência de cabeçalhos de segurança e `se
 - **Status (PATCH /api/tasks/:id/status):** concluir e reabrir; **2 cliques simultâneos em "Concluir" → termina concluída** *(repetição)*; status inválido/ausente → 400; ID inexistente → 404
 - **Exclusão (DELETE /api/tasks/:id):** existe → 204; **2 exclusões simultâneas → uma 204 e outra 404** *(repetição)*; inexistente → 404
 - **Segurança:** cabeçalhos CSP/nosniff/X-Frame-Options e sem `X-Powered-By`; rota de API inexistente → 404 JSON; erro interno real do banco → 500 com mensagem genérica, sem stack
+- **Adicionados na segunda rodada do Prompt 1:** a 61ª escrita no minuto recebe 429 e não grava; outro IP continua gravando; leituras continuam liberadas; HSTS só em HTTPS; `/api/health` responde sem devolver tarefas; com 201 tarefas, a listagem traz 200 e informa o total (também com filtro)
 
 **Mocks:** nenhum. O teste de erro interno provoca uma falha **real** do banco (a tabela é renomeada temporariamente). O único "mock" é o relógio (`Date`), usado no teste do fuso horário.
 **E2E (Playwright):** não foi feito (era opcional).
@@ -138,8 +160,9 @@ Também: nenhum teste automatizado, ausência de cabeçalhos de segurança e `se
 | Versão inicial gerada pela IA (`5b30ede`) | 23 | **22** |
 | Depois do Prompt 1 | **45** | 0 |
 | Depois de cada passo do Prompt 2 | **45** | 0 (no passo 2 houve 3 falhas, que revelaram o bug 5 e foram corrigidas antes do commit) |
+| Depois da segunda rodada do Prompt 1 (8 testes novos) | **53** | 0 |
 
-Saídas em [`evidencias/testes-prompt3-v2.txt`](evidencias/testes-prompt3-v2.txt) e [`evidencias/testes-contra-versao-inicial.txt`](evidencias/testes-contra-versao-inicial.txt).
+Saídas em [`evidencias/testes-prompt3-v2.txt`](evidencias/testes-prompt3-v2.txt), [`evidencias/testes-final.txt`](evidencias/testes-final.txt) (53 testes) e [`evidencias/testes-contra-versao-inicial.txt`](evidencias/testes-contra-versao-inicial.txt).
 Nenhum teste foi apagado, pulado ou afrouxado.
 
 ## Prompt 2 — Refatoração segura

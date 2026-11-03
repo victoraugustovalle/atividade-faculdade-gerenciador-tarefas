@@ -105,3 +105,7 @@ O SQLite (`node:sqlite`) é síncrono e o Node executa cada handler sem intercal
 ## Recomendação final
 
 **Rodar primeiro o Prompt 1 (Auditoria de segurança).** Os dois achados de risco alto (SQL Injection e XSS armazenado) podem ser explorados por qualquer pessoa assim que o sistema for publicado na internet, e a falta de validação no servidor permite gravar dados inválidos no banco. Em seguida vêm o Prompt 3 (testes que travem essas correções) e por último o Prompt 2 (refatorar `server.js`).
+
+---
+
+> **Situação depois das correções:** os achados deste relatório foram tratados nos Prompts 1, 3 e 2. Uma segunda rodada do Prompt 1, feita com o sistema já publicado, está registrada em [docs/PROMPTS.md](docs/PROMPTS.md#segunda-rodada-do-prompt-1-com-o-sistema-já-publicado). Este arquivo foi mantido como o retrato da auditoria original.
