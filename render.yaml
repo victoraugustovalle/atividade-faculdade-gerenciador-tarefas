@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: gerenciador-tarefas-ia
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/tasks
+    envVars:
+      - key: NODE_VERSION
+        value: 24.13.0
+      - key: APP_TIMEZONE
+        value: America/Sao_Paulo
