@@ -1,9 +1,8 @@
 # [ATIVIDADE ACADÊMICA] Gerenciador de Tarefas — Atividade 15 da faculdade
 
 > [!IMPORTANT]
-> **📚 Este repositório é uma atividade acadêmica obrigatória**, feita a pedido do professor na disciplina de Git + Desenvolvimento de Software com IA.
-> Ele existe aqui **apenas para cumprir a exigência de entrega** (o professor pediu que o código fosse publicado no GitHub) e **não faz parte do meu portfólio profissional**.
-> O escopo, o tema e as etapas foram definidos pelo enunciado da atividade.
+> **📚 Atividade acadêmica da faculdade**, desenvolvida conforme solicitação do professor na disciplina de Git + Desenvolvimento de Software com IA.
+> O código foi publicado aqui porque a entrega pelo GitHub fazia parte do enunciado. O tema, o escopo e as etapas seguem o que a atividade pediu.
 
 > ## 🔗 Sistema publicado: **https://atividade-faculdade-gerenciador-tarefas.onrender.com**
 > Repositório: https://github.com/victoraugustovalle/atividade-faculdade-gerenciador-tarefas
