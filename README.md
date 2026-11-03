@@ -12,7 +12,7 @@
 | | |
 |---|---|
 | **Aluno** | Victor Augusto |
-| **Turma** | _preencher_ |
+| **Turma** | 42C7 |
 | **Ferramenta de IA** | Claude Code (Anthropic), usado no VS Code |
 
 ## Objetivo
