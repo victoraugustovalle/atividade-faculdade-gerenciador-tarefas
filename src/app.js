@@ -18,6 +18,8 @@ app.use((req, res, next) => {
     'Referrer-Policy': 'no-referrer',
     'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
   });
+  // HSTS só faz sentido em HTTPS; em HTTP (localhost) o navegador ignoraria e o cabeçalho só confundiria
+  if (req.secure) res.set('Strict-Transport-Security', 'max-age=31536000');
   next();
 });
 app.use(express.json({ limit: '10kb' }));

@@ -317,6 +317,16 @@ describe('Segurança da aplicação', () => {
     assert.equal(res.headers['x-powered-by'], undefined);
   });
 
+  it('quando a requisição chega por HTTPS (via proxy), então envia HSTS', async () => {
+    const res = await api().get('/').set('X-Forwarded-Proto', 'https');
+    assert.equal(res.headers['strict-transport-security'], 'max-age=31536000');
+  });
+
+  it('quando a requisição chega por HTTP, então não envia HSTS', async () => {
+    const res = await api().get('/');
+    assert.equal(res.headers['strict-transport-security'], undefined);
+  });
+
   it('quando acessa uma rota de API inexistente, então devolve 404 em JSON', async () => {
     const res = await api().get('/api/nada');
     assert.equal(res.status, 404);

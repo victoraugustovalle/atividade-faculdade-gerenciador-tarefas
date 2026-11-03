@@ -61,7 +61,7 @@ Sistema web simples para **organizar tarefas pessoais**: o usuário cadastra o q
 │       ├── taskValidation.js  # regras de negócio e validação
 │       └── taskRepository.js  # acesso a dados (todo o SQL fica aqui)
 ├── public/                    # interface (index.html, style.css, app.js)
-├── tests/tasks.test.js        # 48 testes de integração
+├── tests/tasks.test.js        # 50 testes de integração
 ├── AUDITORIA.md               # relatório do Prompt 4
 └── docs/
     ├── PROMPTS.md             # registro dos 4 prompts: achados, decisões e relato
@@ -123,10 +123,10 @@ Comando único, para rodar depois de **toda** alteração:
 npm test
 ```
 
-- **48 testes de integração** no estilo *request spec*: cada teste chama a rota HTTP real, com banco SQLite real **em memória**. O banco de produção nunca é usado, e há uma trava no início do arquivo de teste que aborta se o banco não for o de memória.
+- **50 testes de integração** no estilo *request spec*: cada teste chama a rota HTTP real, com banco SQLite real **em memória**. O banco de produção nunca é usado, e há uma trava no início do arquivo de teste que aborta se o banco não for o de memória.
 - Nada é mockado: banco, validação e regras rodam de verdade. O sistema não tem serviços externos, então não há o que simular.
-- Cobrem o caminho feliz, os erros esperados, a repetição (clique duplo e requisições simultâneas com `Promise.all`), os limites (3 e 100 caracteres, prazo hoje, 10 kb) e a segurança (SQL Injection, XSS, cabeçalhos, erro interno sem stack, limite de escritas por IP).
-- **Resultado atual: 48 passam, 0 falham.** Os mesmos testes rodados contra a versão inicial gerada pela IA: **22 falham** (veja `docs/evidencias/`).
+- Cobrem o caminho feliz, os erros esperados, a repetição (clique duplo e requisições simultâneas com `Promise.all`), os limites (3 e 100 caracteres, prazo hoje, 10 kb) e a segurança (SQL Injection, XSS, cabeçalhos e HSTS, erro interno sem stack, limite de escritas por IP).
+- **Resultado atual: 50 passam, 0 falham.** Os mesmos testes rodados contra a versão inicial gerada pela IA: **22 falham** (veja `docs/evidencias/`).
 
 Os cenários detalhados estão em [docs/PROMPTS.md](docs/PROMPTS.md#prompt-3--testes-de-integração).
 
